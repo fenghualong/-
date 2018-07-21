@@ -1,0 +1,143 @@
+题目描述
+继MIUI8推出手机分身功能之后，MIUI9计划推出一个电话号码分身的功能：首先将电话号码中的每个数字加上8取个位，然后使用对应的大写字母代替 
+（
+"ZERO", 	z
+"ONE", 					o-z-w-u
+"TWO", 		w
+"THREE", 		h-g
+"FOUR", 	u
+"FIVE", 		f-u
+"SIX", 		x
+"SEVEN", 			s-x
+"EIGHT", 	g
+"NINE"					i-g-x-f+u
+）， 然后随机打乱这些字母，所生成的字符串即为电话号码对应的分身。
+输入描述:
+第一行是一个整数T（1 ≤ T ≤ 100)表示测试样例数；接下来T行，每行给定一个分身后的电话号码的分身（长度在3到10000之间）。
+输出描述:
+输出T行，分别对应输入中每行字符串对应的分身前的最小电话号码（允许前导0）。
+示例1
+输入
+4
+EIGHT
+ZEROTWOONE
+OHWETENRTEO
+OHEWTIEGTHENRTEO
+输出
+0
+234
+345
+0345
+
+
+解题思路：
+链接：https://www.nowcoder.com/questionTerminal/493d71a992f44554a500ed818056e1a6
+来源：牛客网
+
+要先依次解码具有独一无二字符的数字，具有这样特点的数字有五个分别是FOUR(U),SIX(X),
+TWO(W),EIGHT(G),ZERO(Z),可以根据独特字符的个数直接判断有多少个相应的数字，例如有
+3个U那么就一定有3个FOUR...,解码完成这五个数字之后另外的数字也会由于这些数字的移除
+而具有了独一无二的字符，这样的数字有FIVE(F)，THREE(T),FIVE找到之后，只有SEVEN含
+有V,所以又可以依据V字符的个数解码SEVEN的个数，最后剩下的ONE和NINE也具有了自己的
+标志性字符分别是ONE(O),NINE(I)，需要注意的是原始数字和最终出现的数字还有一个转换
+的过程（加8取个位数），所以还要相应转换回去。最后要注意的是，要求每行字符串对应的
+分身前的最小电话号码，不要傻傻的按照字典序排序，这样时间复杂度过高，对于这个问题
+可以用桶排序，10个bucket分别用于统计0-9出现的次数，最终桶中存储的结果依次输出就是
+所有组合中最小的数字。
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+int map(char ch);
+
+int main()
+{
+    int n;
+
+    char str[10001];
+
+    FILE *in = fopen("input.txt","r");
+
+    fscanf(in, "%d", &n);
+
+    while(n--)
+    {
+        fscanf(in, "%s", str);
+        int num[10] = {0};
+        int index = 0;
+        while(str[index] != '\0' && str[index] != '\n')
+        {
+            if(map(str[index]) != -1)
+                num[map(str[index])]++;
+
+            index++;
+        }
+
+
+        num[3] -= num[8];
+        num[5] -= num[4];
+        num[7] -= num[6];
+        num[1] -= (num[0] + num[2] + num[4]);
+        num[9] -= (num[8] + num[6] + num[5]);
+
+
+        for(int i = 8; i < 10; i++)
+            for(int cnt = 0; cnt < num[i]; cnt++)
+                printf("%d",i-8);
+
+        for(int i = 0; i < 8; i++)
+            for(int cnt = 0; cnt < num[i]; cnt++)
+                printf("%d",i-8+10);
+
+        printf("\n");
+    }
+
+
+
+
+    return 0;
+}
+
+int map(char ch)
+{
+    switch(ch)
+    {
+        case 'Z':
+            return 0;
+        case 'W':
+            return 2;
+        case 'U':
+            return 4;
+        case 'X':
+            return 6;
+        case 'G':
+            return 8;
+        case 'H':
+            return 3;
+        case 'F':
+            return 5;
+        case 'S':
+            return 7;
+        case 'O':
+            return 1;
+        case 'I':
+            return 9;
+        default:
+            return -1;
+    }
+}
+
+//
+//"ZERO", 	z
+//"ONE", 					o-z-w-u
+//"TWO", 		w
+//"THREE", 		h-g
+//"FOUR", 	u
+//"FIVE", 		f-u
+//"SIX", 		x
+//"SEVEN", 		s-x
+//"EIGHT", 	g
+//"NINE"					i-g-x-f+u

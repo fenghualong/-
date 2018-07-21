@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1531829555 source:f:\fenghl\c_and_pointer\classicissue\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<math.h>
+
+1532090977 source:f:\fenghl\c_and_pointer\classicissue\main.cpp
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	<cctype>
+	<cmath>
+	<vector>
+	<deque>
+	<algorithm>
+	<queue>
+

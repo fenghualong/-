@@ -1,0 +1,141 @@
+今天我们看到的阿里巴巴提供的任何一项服务后边都有着无数子系统和组件的支撑，子系统之间也互相依赖关联， 
+其中任意一个环节出现问题都可能对上游链路产生影响。小明做为新人接收到的第一个任务就是去梳理所有的依赖关系， 
+小明和每个系统的负责人确认了依赖关系，记录下调用对应系统的耗时，用这些数据分析端到端链路的数目和链路上最长的耗时。
+
+输入： 小明搜集到的系统耗时和依赖列表 
+5 4 // 表示有5个系统和 4个依赖关系 
+3 // 调用1号系统耗时 3 ms 
+2 // 调用2号系统耗时 2 ms 
+10 // 调用3号系统耗时 10 ms 
+5 // 调用4号系统耗时 5 ms 
+7 // 调用5号系统耗时 7 ms 
+1 2 // 2号系统依赖1号系统 
+1 3 // 3号系统依赖1号系统 
+2 5 // 2号系统依赖5号系统 
+4 5 // 4号系统依赖5号系统
+
+输出: 调用链路的数目 和最大的耗时， 这里有三条链路1->2->5，1->3， 4->5，最大的耗时是1到3的链路 3+10 = 13，无需考虑环形依赖的存在。 
+3 13
+
+
+
+5 4
+3
+2
+10
+5
+7
+1 2
+1 3
+2 5
+4 5
+
+
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <vector>
+#include <iostream>
+#include <set>
+#include <stack>
+
+using namespace std;
+
+void findLinks(vector<vector<int> > &dependenceMap, unsigned int row, \
+            vector<int> &aLink, vector<vector<int> > &link, set<int> &isDependence);
+
+void printTwoVector(vector<vector<int> > &dependenceMap);
+
+unsigned int maxTimeConsume(const vector<int>  &timeConsume, \
+                   const vector<vector<int> > &link);
+
+int main()
+{
+
+    int numOfSystem, dependence;
+
+    FILE *in = fopen("input.txt","r");
+
+    fscanf(in, "%d %d", &numOfSystem, &dependence);
+
+    vector<int>  timeConsume(numOfSystem);
+    for(int i = 0; i < numOfSystem; i++)
+    {
+        fscanf(in, "%d", &timeConsume[i]);
+    }
+
+    vector<vector<int> > dependenceMap(numOfSystem);
+    for(int i = 0; i < dependence; i++)
+    {
+        int sys1, sys2;
+        fscanf(in, "%d %d", &sys1, &sys2);
+        dependenceMap[sys1-1].push_back(sys2-1);
+    }
+
+    set<int> isDependence;
+    vector<vector<int> > link;
+    vector<int> aLink;
+
+    for(unsigned int row = 0; row < dependenceMap.size(); row++)
+    {
+        if(isDependence.count(row) == 0)
+            findLinks(dependenceMap, row, aLink, link, isDependence);
+    }
+    printTwoVector(link);
+
+    printf("%d %d\n", link.size(), maxTimeConsume(timeConsume, link));
+
+
+    return 0;
+}
+
+void findLinks(vector<vector<int> > &dependenceMap, unsigned int row, \
+            vector<int> &aLink, vector<vector<int> > &link, set<int> &isDependence)
+{
+    aLink.push_back(row);
+    isDependence.insert(row);
+    if(dependenceMap[row].empty())
+    {
+        link.push_back(aLink);
+    }
+
+    for(unsigned int col = 0; col < dependenceMap[row].size(); col++)
+    {
+        findLinks(dependenceMap, dependenceMap[row][col], aLink, link, isDependence);
+    }
+
+    aLink.pop_back();
+    return;
+}
+
+unsigned int maxTimeConsume(const vector<int>  &timeConsume, \
+                   const vector<vector<int> > &link)
+{
+    unsigned int retMax = 0;
+    for(unsigned int row = 0; row < link.size(); row++)
+    {
+        unsigned int time = 0;
+        for(unsigned int col = 0; col < link[row].size(); col++)
+        {
+            time += timeConsume[link[row][col]];
+        }
+        retMax = time > retMax ? time : retMax;
+    }
+    return retMax;
+}
+
+void printTwoVector(vector<vector<int> > &dependenceMap)
+{
+    for(unsigned int row = 0; row < dependenceMap.size(); row++)
+    {
+        cout << row+1 << ": ";
+        for(unsigned int col = 0; col < dependenceMap[row].size(); col++)
+        {
+            cout << dependenceMap[row][col]+1 << " ";
+        }
+        cout << endl;
+    }
+}

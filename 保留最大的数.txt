@@ -1,0 +1,67 @@
+题目描述
+给定一个十进制的正整数number，选择从里面去掉一部分数字，希望保留下来的数字组成的正整数最大。
+输入描述:
+输入为两行内容，第一行是正整数number，1 ≤ length(number) ≤ 50000。第二行是希望去掉的数字数量cnt 1 ≤ cnt < length(number)。
+输出描述:
+输出保留下来的结果。
+示例1
+输入
+325 1
+输出
+35
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+#include <vector>
+#include <deque>
+
+using namespace std;
+
+int main()
+{
+    char number[50001];
+
+    int cnt;
+
+    FILE *in = fopen("input.txt","r");
+
+    fscanf(in, "%s", number);
+
+    fscanf(in, "%d", &cnt);
+
+    int len = strlen(number);
+
+    deque<char> maxValue(len);
+    maxValue.resize(0);
+
+    int index;
+    int deleteNum = 0;//954561831654 2
+    for(index = 0; index < len; index++)
+    {
+        if(!maxValue.empty() && maxValue.back() < number[index])
+        {
+            maxValue.pop_back();
+            deleteNum++;
+            index--;
+        }else
+        {
+            maxValue.push_back(number[index]);
+        }
+
+        if(deleteNum == cnt)break;
+    }
+
+    for(int i = 0; !maxValue.empty() && i < len - cnt; i++)
+    {
+        printf("%c", maxValue.front());
+        maxValue.pop_front();
+    }
+
+    for(index = index + 1; index < len; index++)
+        printf("%c", number[index]);
+
+    return 0;
+}

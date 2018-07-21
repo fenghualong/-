@@ -1,0 +1,80 @@
+//设有n个正整数，将他们连接成一排，组成一个最大的多位整数。
+//如:n=3时，3个整数13,312,343,连成的最大整数为34331213。
+//如:n=4时,4个整数7,13,4,246连接成的最大整数为7424613。
+//输入描述:
+//有多组测试样例，每组测试样例包含两行，第一行为一个整数N（N<=100），
+//第二行包含N个数(每个数不超过1000，空格分开)。
+//输出描述:
+//每组数据输出一个表示最大的整数。
+//示例1
+//输入
+//2
+//12 123
+//4
+//7 13 4 246
+//输出
+//12312
+//7424613
+
+//2
+//12 123
+
+//37
+//93 936 672 946 153 947 82 522 772 725 413 649 399 123 821 93 29 860 572 344 608 590 554 210 115 307 313 535 636 184 291 66 178 379 204 523 758
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int strcompare(const char **str1, const char **str2);
+
+int main()
+{
+    int n;
+    char** array;
+    char aData[5];
+
+    FILE *fp = fopen("input.txt","r");
+
+    fscanf(fp,"%d",&n);
+
+    if((array = (char**)malloc(sizeof(char *)*n)) == NULL)
+        exit(-1);
+
+    memset(array, 0, sizeof(char *)*n);
+
+    for(int i = 0; i < n; i++)
+    {
+        fscanf(fp,"%s",aData);
+
+        if((array[i] = (char *)malloc(strlen(aData)+1)) == NULL)
+            exit(-1);
+
+        strcpy(array[i],aData);
+    }
+
+    qsort((void *)array, n, sizeof(char**), \
+          (int(*)(const void *, const void *))&strcompare);
+
+
+    for(int i = 0; i < n; i++)
+    {
+        fprintf(stdout, "%s ", array[i]);
+    }
+    fprintf(stdout, "\n");
+
+    return 0;
+}
+
+
+int strcompare(const char **str1, const char **str2)
+{
+    const char *s1 = *str1;
+    const char *s2 = *str2;
+    char comb1[10];
+    char comb2[10];
+    sprintf(comb1,"%s%s",s1,s2);
+    sprintf(comb2,"%s%s",s2,s1);
+    return -strcmp(comb1,comb2);
+}
