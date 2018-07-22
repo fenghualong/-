@@ -45,12 +45,12 @@
 using namespace std;
 
 void findLinks(vector<vector<int> > &dependenceMap, unsigned int row, \
-            vector<int> &aLink, vector<vector<int> > &link, set<int> &isDependence);
+            vector<int> &aLink, vector<vector<int> > &links, set<int> &isDependence);
 
 void printTwoVector(vector<vector<int> > &dependenceMap);
 
 unsigned int maxTimeConsume(const vector<int>  &timeConsume, \
-                   const vector<vector<int> > &link);
+                   const vector<vector<int> > &links);
 
 int main()
 {
@@ -76,35 +76,35 @@ int main()
     }
 
     set<int> isDependence;
-    vector<vector<int> > link;
+    vector<vector<int> > links;
     vector<int> aLink;
 
     for(unsigned int row = 0; row < dependenceMap.size(); row++)
     {
         if(isDependence.count(row) == 0)
-            findLinks(dependenceMap, row, aLink, link, isDependence);
+            findLinks(dependenceMap, row, aLink, links, isDependence);
     }
-    printTwoVector(link);
+    printTwoVector(links);
 
-    printf("%d %d\n", link.size(), maxTimeConsume(timeConsume, link));
+    printf("%d %d\n", links.size(), maxTimeConsume(timeConsume, links));
 
 
     return 0;
 }
 
 void findLinks(vector<vector<int> > &dependenceMap, unsigned int row, \
-            vector<int> &aLink, vector<vector<int> > &link, set<int> &isDependence)
+            vector<int> &aLink, vector<vector<int> > &links, set<int> &isDependence)
 {
     aLink.push_back(row);
     isDependence.insert(row);
-    if(dependenceMap[row].empty())
+    if(dependenceMap[row].empty() && aLink.size() > 1)
     {
-        link.push_back(aLink);
+        links.push_back(aLink);
     }
 
     for(unsigned int col = 0; col < dependenceMap[row].size(); col++)
     {
-        findLinks(dependenceMap, dependenceMap[row][col], aLink, link, isDependence);
+        findLinks(dependenceMap, dependenceMap[row][col], aLink, links, isDependence);
     }
 
     aLink.pop_back();
@@ -112,15 +112,15 @@ void findLinks(vector<vector<int> > &dependenceMap, unsigned int row, \
 }
 
 unsigned int maxTimeConsume(const vector<int>  &timeConsume, \
-                   const vector<vector<int> > &link)
+                   const vector<vector<int> > &links)
 {
     unsigned int retMax = 0;
-    for(unsigned int row = 0; row < link.size(); row++)
+    for(unsigned int row = 0; row < links.size(); row++)
     {
         unsigned int time = 0;
-        for(unsigned int col = 0; col < link[row].size(); col++)
+        for(unsigned int col = 0; col < links[row].size(); col++)
         {
-            time += timeConsume[link[row][col]];
+            time += timeConsume[links[row][col]];
         }
         retMax = time > retMax ? time : retMax;
     }
@@ -139,3 +139,4 @@ void printTwoVector(vector<vector<int> > &dependenceMap)
         cout << endl;
     }
 }
+

@@ -10,68 +10,46 @@
 
 using namespace std;
 
-typedef struct Hotel_
-{
-    int startDay;
-    int endDay;
-    int price;
-}Hotel;
-
-bool compare(Hotel &hotel1, Hotel &hotel2);
-
 int main()
 {
-    FILE *in = fopen("input.txt","r");
+    FILE *in = stdin;//fopen("input.txt","r");
 
     int startDay, endDay, price;
 
-    deque<Hotel> result;
-    vector<Hotel> input;
+    int *priceTable = new int[50000];
 
     while(fscanf(in, "%d %d %d", &startDay, &endDay, &price) == 3)
     {
-        Hotel hotel = {startDay, endDay, price};
-        input.push_back(hotel);
+        for(int i = startDay; i <= endDay && i < 50000; i++)
+            priceTable[i] = price;
     }
 
-    sort(input.begin(), input.end(), compare);
-
-    while(!input.empty())
+    int index = 0;
+    bool isFirst = true;
+    while(index < 50000)
     {
-        Hotel hotel = input.back();
-        input.pop_back();
-        if(result.empty())
+        price = 0;
+        while(index < 50000 && priceTable[index] == 0)
+            index++;
+
+        startDay = index;
+        price = priceTable[index];
+
+        while(index < 50000 && priceTable[index] == price)
+            index++;
+
+        endDay = index-1;
+
+        if(isFirst)
         {
-            result.push_back(hotel);
-        }else if(result.back().price == hotel.price)
+            printf("[%d, %d, %d]", startDay, endDay, price);
+            isFirst = false;
+        }else if(price != 0)
         {
-            result.back().endDay = hotel.endDay;
-        }else if(result.back().endDay < hotel.startDay)
-        {
-            result.push_back(hotel);
-        }else
-        {
-            result.back().endDay = hotel.startDay - 1;
-            result.push_back(hotel);
+            printf(",[%d, %d, %d]", startDay, endDay, price);
         }
     }
 
-    for(unsigned int i = 0; i < result.size(); i++)
-    {
-        if(i == 0)
-        {
-            printf("[%d, %d, %d]", result[i].startDay, result[i].endDay, result[i].price);
-        }else
-        {
-            printf(",[%d, %d, %d]", result[i].startDay, result[i].endDay, result[i].price);
-        }
-    }
-
+    delete[] priceTable;
     return 0;
-}
-
-bool compare(Hotel &hotel1, Hotel &hotel2)
-{
-    return hotel1.startDay > hotel2.startDay;
-
 }
